@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Task Tracker</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="auth-bg">
+  <div class="container">
+    <!-- login -->
+    <div id="loginPage" class="page active">
+      <h1>Σύνδεση</h1>
+      <div id="loginErrorMessage" class="error-message"></div>
+      <form id="loginForm">
+        <input type="text" id="loginUsername" placeholder="Όνομα χρήστη ή Email" required />
+        <input type="password" id="loginPassword" placeholder="Κωδικός" required />
+        <button type="submit">Σύνδεση</button>
+      </form>
+      <p>Δεν έχεις λογαριασμό; 
+        <a href="#" onclick="showPage('registerPage')">Εγγραφή</a>
+      </p>
+    </div>
+    <!-- register -->
+    <div id="registerPage" class="page">
+      <h1>Εγγραφή</h1>
+      <div id="registerErrorMessage" class="error-message"></div>
+      <form id="registerForm">
+        <input type="text" id="registerUsername" placeholder="Όνομα χρήστη" required />
+        <input type="email" id="registerEmail" placeholder="Email" required />
+        <input type="password" id="registerPassword" placeholder="Κωδικός" required />
+        <button type="submit">Εγγραφή</button>
+      </form>
+      <p>Έχεις ήδη λογαριασμό;
+        <a href="#" onclick="showPage('loginPage')">Σύνδεση</a>
+      </p>
+    </div>
+    <!-- task -->
+    <div id="tasksPage" class="page">
+      <h1 id="tasksHeading">Οι εργασίες μου</h1>
+      <div class="input-group">
+        <input id="taskTitle" placeholder="Νέα εργασία..." />
+        <button id="addTaskBtn">Προσθήκη</button>
+      </div>
+      <div id="taskErrorMessage" class="error-message"></div>
+
+      <ul id="taskList"></ul>
+
+      <div class="filters">
+        <button onclick="filterTasks('all')">Όλα</button>
+        <button onclick="filterTasks('done')">Ολοκληρωμένα</button>
+        <button onclick="filterTasks('pending')">Εκκρεμή</button>
+      </div>
+
+      <button id="logout-btn" class="logout-btn">Αποσύνδεση</button>
+    </div>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>

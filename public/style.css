@@ -1,0 +1,231 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: background 0.5s ease-in-out;
+}
+
+body.auth-bg {
+  background: url("images/login-bg.jpg") no-repeat center center fixed;
+  background-size: cover;
+}
+
+body.tasks-bg {
+  background: url("images/tasks-bg.jpg") no-repeat center center fixed;
+  background-size: cover;
+}
+
+.container {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 30px 40px;
+  border-radius: 14px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  width: 90%;
+  max-width: 500px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  max-height: 80vh;
+}
+
+h1, h2 {
+  margin-bottom: 20px;
+  color: #333;
+  font-size: 1.8em;
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  border: 2px solid #ccc;
+  border-radius: 6px;
+  outline: none;
+  transition: all 0.3s ease;
+  font-size: 1em;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+input:focus {
+  border-color: #0078d7;
+  box-shadow: 0 0 8px rgba(0, 120, 215, 0.5);
+}
+
+button {
+  padding: 10px 16px;
+  border: none;
+  background-color: #0078d7;
+  color: white;
+  font-weight: bold;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  font-size: 1em;
+}
+
+button:hover {
+  background-color: #005a9e;
+}
+
+.logout-btn {
+  background-color: #dc3545;
+}
+
+.logout-btn:hover {
+  background-color: #b21f2d;
+}
+
+.error-message, #errorMessage {
+  color: #dc3545;
+  margin-bottom: 10px;
+  font-weight: bold;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 300px;
+  overflow-y: auto;
+  overflow-x: hidden; 
+  width: 100%;
+  box-sizing: border-box;
+}
+
+ul li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f7f7f7;
+  margin-bottom: 10px;
+  padding: 12px;
+  border-radius: 8px;
+  transition: transform 0.2s ease, background 0.2s ease;
+  min-height: 40px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+ul li:hover {
+  transform: scale(1.02);
+  background: #f0f0f0;
+}
+
+ul li span {
+  flex: 1;
+  margin-right: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+ul li.done span {
+  text-decoration: line-through;
+  color: gray;
+}
+
+.btn {
+  padding: 6px 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-left: 5px;
+  font-size: 0.9em;
+  flex-shrink: 0;
+}
+
+.btn.toggle {
+  background-color: #28a745;
+  color: white;
+}
+
+.btn.toggle:hover {
+  background-color: #1e7e34;
+}
+
+.btn.delete {
+  background-color: #dc3545;
+  color: white;
+}
+
+.btn.delete:hover {
+  background-color: #b21f2d;
+}
+
+.page {
+  display: none;
+}
+
+.page.active {
+  display: flex;
+  flex-direction: column;
+}
+
+.input-group {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.input-group input {
+  flex: 1;
+}
+
+.input-group button {
+  flex-shrink: 0;
+}
+
+.filters {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+  gap: 5px;
+}
+
+.filters button {
+  flex: 1;
+}
+
+@media (max-width: 600px) {
+  .container {
+    width: 100%;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 20px;
+    max-height: 90vh;
+  }
+
+  ul li {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  ul li span {
+    width: 100%;
+    margin-bottom: 5px;
+  }
+
+  .input-group {
+    flex-direction: column;
+  }
+
+  .input-group button {
+    width: 100%;
+  }
+
+  .filters {
+    flex-direction: column;
+  }
+
+  .filters button {
+    width: 100%;
+  }
+}
