@@ -29,7 +29,7 @@ function showPage(pageId) {
     document.body.className = "tasks-bg";
     loadTasks();
     const user = JSON.parse(localStorage.getItem("user") || "null");
-    if (user) document.getElementById("tasksHeading").textContent = `Εργασίες του ${user.username}`;
+    if (user) document.getElementById("tasksHeading").textContent = `${user.username}'s tasks`;
   } else {
     document.body.className = "auth-bg";
   }
