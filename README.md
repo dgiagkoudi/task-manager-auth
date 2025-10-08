@@ -27,6 +27,24 @@
 - HTML / CSS / JavaScript
 - Deployment σε Render
 
+## Δομή φακέλων 
+```text
+task-manager-auth
+├─ src/
+│  ├─ controllers/
+│  │    ├─ authController.js
+│  │    └─ taskController.js
+│  ├─ middlewares/
+│  │    ├─ authMiddleware.js
+│  │    └─ errorHandler.js
+│  ├─ models/
+│  │    └─ prismaClient.js
+│  ├─ routes/
+│  │    ├─ authRoutes.js
+│  │    └─ taskRoutes.js
+│  └─ index.js
+```
+
 ## Εκκίνηση τοπικά
 1. Κλωνοποίησε το repo:
 
