@@ -57,7 +57,7 @@ JWT_SECRET="supersecretkey"
 ACCESS_TOKEN_EXPIRES_IN=15m
 REFRESH_TOKEN_EXPIRES_IN=7d
 COOKIE_SECURE=false
-# SMTP (Brevo)
+
 SMTP_HOST="smtp-relay.brevo.com"
 SMTP_PORT=587
 SMTP_USER="9974e5001@smtp-brevo.com"
