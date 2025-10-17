@@ -1,6 +1,8 @@
 const prisma = require("../models/prismaClient");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const nodemailer = require("nodemailer");
+const crypto = require("crypto");
 require("dotenv").config();
 
 const ACCESS_TOKEN_EXPIRES_IN = process.env.ACCESS_TOKEN_EXPIRES_IN || "1h";
@@ -21,6 +23,34 @@ function signRefreshToken(user) {
     process.env.JWT_SECRET,
     { expiresIn: REFRESH_TOKEN_EXPIRES_IN }
   );
+}
+
+// Transporter gia apostoli email 
+const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST,
+  port: process.env.SMTP_PORT,
+  secure: false,
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+  },
+});
+
+async function sendResetEmail(email, token) {
+  const resetUrl = `${process.env.FRONTEND_URL}?token=${token}`;
+  const mailOptions = {
+    from: process.env.SMTP_FROM,
+    to: email,
+    subject: "Επαναφορά Κωδικού - Task Manager",
+    html: `
+      <p>Γεια σου,</p>
+      <p>Ζήτησες επαναφορά κωδικού. Πάτησε τον παρακάτω σύνδεσμο:</p>
+      <a href="${resetUrl}" target="_blank">${resetUrl}</a>
+      <p>Ο σύνδεσμος θα ισχύει για 15 λεπτά.</p>
+    `,
+  };
+
+  await transporter.sendMail(mailOptions);
 }
 
 // register
@@ -109,8 +139,8 @@ const refresh = async (req, res, next) => {
     }
 
     const newAccess = signAccessToken(user);
-
     const newRefresh = signRefreshToken(user);
+    
     await prisma.user.update({ where: { id: user.id }, data: { refreshToken: newRefresh } });
 
     res.cookie("refreshToken", newRefresh, {
@@ -142,4 +172,60 @@ const logout = async (req, res, next) => {
   }
 };
 
-module.exports = { register, login, refresh, logout };
+// forgot password
+const forgotPassword = async (req, res, next) => {
+  const { email } = req.body;
+  if (!email) return res.status(400).json({ error: "Απαιτείται email" });
+
+  try {
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (!user) return res.status(404).json({ error: "Δεν υπάρχει χρήστης με αυτό το email" });
+
+    const resetToken = crypto.randomBytes(32).toString("hex");
+    const expiry = new Date(Date.now() + 1000 * 60 * 15);
+
+    await prisma.user.update({where: { id: user.id }, data: { resetToken, resetTokenExpiry: expiry }});
+
+    await sendResetEmail(email, resetToken);
+
+    res.json({ message: "Εστάλη email επαναφοράς κωδικού!" });
+  } catch (err) {
+    console.error(err);
+    next(err);
+  }
+};
+
+// reset password
+const resetPassword = async (req, res, next) => {
+  const { token, newPassword } = req.body;
+  if (!token || !newPassword)
+    return res.status(400).json({ error: "Λείπουν δεδομένα" });
+
+  try {
+    const user = await prisma.user.findFirst({
+      where: {
+        resetToken: token,
+        resetTokenExpiry: { gt: new Date() }
+      }
+    });
+
+    if (!user)
+      return res.status(400).json({ error: "Μη έγκυρο ή ληγμένο token" });
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        password: hashedPassword,
+        resetToken: null,
+        resetTokenExpiry: null
+      }
+    });
+
+    res.json({ message: "Ο κωδικός άλλαξε επιτυχώς!" });
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports = { register, login, refresh, logout, forgotPassword, resetPassword };

@@ -194,6 +194,41 @@ ul li.done span {
   flex: 1;
 }
 
+#tasksVideo {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -1; 
+  display: none;
+}
+
+body.tasks-bg #tasksVideo {
+  display: block;
+}
+
+#footer {
+  position: fixed;
+  bottom: 10px;
+  width: 100%;
+  text-align: center;
+  font-size: 0.8rem;
+  color: white;
+  text-shadow: 0 0 5px rgba(0,0,0,0.7);
+  z-index: 10;
+}
+
+#footer a {
+  color: #fff;
+  text-decoration: underline;
+}
+
+#footer a:hover {
+  color: #0078d7;
+}
+
 @media (max-width: 600px) {
   ul li {
     flex-direction: row;

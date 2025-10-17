@@ -7,7 +7,11 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body class="auth-bg">
+  <video id="tasksVideo" autoplay muted loop playsinline>
+    <source src="images/tasks-bg.mp4" type="video/mp4">
+  </video>
   <div class="container">
+
     <!-- login -->
     <div id="loginPage" class="page active">
       <h1>Σύνδεση</h1>
@@ -17,10 +21,10 @@
         <input type="password" id="loginPassword" placeholder="Κωδικός" required />
         <button type="submit">Σύνδεση</button>
       </form>
-      <p>Δεν έχεις λογαριασμό; 
-        <a href="#" onclick="showPage('registerPage')">Εγγραφή</a>
-      </p>
+      <p><a href="#" onclick="showPage('forgotPasswordPage')">Ξέχασες τον κωδικό;</a></p>
+      <p>Δεν έχεις λογαριασμό; <a href="#" onclick="showPage('registerPage')">Εγγραφή</a></p>
     </div>
+
     <!-- register -->
     <div id="registerPage" class="page">
       <h1>Εγγραφή</h1>
@@ -35,6 +39,29 @@
         <a href="#" onclick="showPage('loginPage')">Σύνδεση</a>
       </p>
     </div>
+
+    <!-- forgot password -->
+    <div id="forgotPasswordPage" class="page">
+      <h1>Ανάκτηση Κωδικού</h1>
+      <div id="forgotErrorMessage" class="error-message"></div>
+      <form id="forgotForm">
+        <input type="email" id="forgotEmail" placeholder="Το email σου" required />
+        <button type="submit">Αποστολή σύνδεσμου επαναφοράς</button>
+      </form>
+      <p><a href="#" onclick="showPage('loginPage')">Επιστροφή στη Σύνδεση</a></p>
+    </div>
+
+    <!-- reset password -->
+    <div id="resetPasswordPage" class="page">
+      <h1>Νέος Κωδικός</h1>
+      <div id="resetErrorMessage" class="error-message"></div>
+      <form id="resetForm">
+        <input type="password" id="newPassword" placeholder="Νέος Κωδικός" required />
+        <button type="submit">Αλλαγή Κωδικού</button>
+      </form>
+      <p><a href="#" onclick="showPage('loginPage')">Επιστροφή στη Σύνδεση</a></p>
+    </div>
+
     <!-- task -->
     <div id="tasksPage" class="page">
       <h1 id="tasksHeading">Οι εργασίες μου</h1>
@@ -55,6 +82,11 @@
       <button id="logout-btn" class="logout-btn">Αποσύνδεση</button>
     </div>
   </div>
+
+  <footer id="footer">
+    <p>© 2025 Powered by <a href="https://github.com/dgiagkoudi" 
+      target="_blank" rel="noopener noreferrer">dgiagkoudi</a>. All rights reserved.</p>
+  </footer>
 
   <script src="main.js"></script>
 </body>

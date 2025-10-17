@@ -1,31 +1,43 @@
 # Task Manager Auth
 
-Εφαρμογή Task Manager με authentication για χρήστες, βασισμένο σε Node.js, Express και PostgreSQL. Οι χρήστες μπορούν να εγγραφούν, να συνδεθούν και να διαχειριστούν τις εργασίες τους (προσθήκη, διαγραφή, ολοκλήρωση). Η εφαρμογή χρησιμοποιεί Prisma για ORM και JWT για ασφαλή authentication. Το frontend είναι responsive και λειτουργικό τόσο σε desktop όσο και σε κινητά. 
+Μια πλήρως λειτουργική εφαρμογή διαχείρισης εργασιών (To-Do List) με σύστημα εγγραφής, σύνδεσης, επαναφοράς κωδικού και ασφαλή αποθήκευση δεδομένων μέσω PostgreSQL & Prisma ORM.  
+Αναπτύχθηκε με Node.js, Express και σύγχρονη responsive διεπαφή.
 
 ## Λειτουργίες
 
-- Εγγραφή νέου χρήστη
+- Εγγραφή & Σύνδεση χρηστών με JWT Authentication
 
-- Σύνδεση με username/email και password
+- Ασφαλής αποθήκευση δεδομένων με Prisma ORM & PostgreSQL
 
-- Προσθήκη νέας εργασίας
+- Ανάκτηση / Επαναφορά κωδικού μέσω email (SMTP - Brevo)
 
-- Σήμανση εργασίας ως ολοκληρωμένη / μη ολοκληρωμένη
-
-- Διαγραφή εργασίας
-
-- Φιλτράρισμα εργασιών (όλα, ολοκληρωμένα, εκκρεμή)
-
-- Αποσύνδεση
+- Προσθήκη, επεξεργασία & διαγραφή tasks 
 
 ## Τεχνολογίες
-- Node.js
-- Express
-- PostgreSQL
-- Prisma
-- JWT (JSON Web Tokens)
-- HTML / CSS / JavaScript
-- Deployment σε Render
+
+- Frontend: HTML, CSS, JavaScript
+- Backend: Node.js, Express.js  
+- Database: PostgreSQL  
+- Deployment: Render  
+- Email Service: Brevo
+
+## Δομή φακέλων 
+```text
+task-manager-auth
+├─ src/
+│  ├─ controllers/
+│  │    ├─ authController.js
+│  │    └─ taskController.js
+│  ├─ middlewares/
+│  │    ├─ authMiddleware.js
+│  │    └─ errorHandler.js
+│  ├─ models/
+│  │    └─ prismaClient.js
+│  ├─ routes/
+│  │    ├─ authRoutes.js
+│  │    └─ taskRoutes.js
+│  └─ index.js
+```
 
 ## Δομή φακέλων 
 ```text
@@ -48,7 +60,7 @@ task-manager-auth
 ## Εκκίνηση τοπικά
 1. Κλωνοποίησε το repo:
 
-git clone <repo-url>
+git clone https://github.com/dgiagkoudi/task-manager-auth.git
 
 cd task-manager-auth
 
@@ -59,14 +71,16 @@ npm install
 3. Δημιούργησε ένα .env αρχείο με τις παρακάτω μεταβλητές:
 
 DATABASE_URL="postgresql://<user>:<password>@localhost:5432/<dbname>?schema=public"
-
 JWT_SECRET="supersecretkey"
-
 ACCESS_TOKEN_EXPIRES_IN=15m
-
 REFRESH_TOKEN_EXPIRES_IN=7d
-
 COOKIE_SECURE=false
+# SMTP (Brevo)
+SMTP_HOST="smtp-relay.brevo.com"
+SMTP_PORT=587
+SMTP_USER="9974e5001@smtp-brevo.com"
+SMTP_PASS="<το_API_key_σου_από_Brevo>"
+EMAIL_FROM="το_email_σου@domain.com"
 
 4. Δημιούργησε και τρέξε τις migrations:
 

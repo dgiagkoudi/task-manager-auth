@@ -106,6 +106,67 @@ async function login(e) {
   }
 }
 
+async function forgotPassword(e) {
+  e.preventDefault();
+  const email = document.getElementById("forgotEmail").value.trim();
+  if (!email) return;
+
+  try {
+    const res = await fetch("/api/auth/forgot-password", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email })
+    });
+    const data = await res.json();
+
+    if (res.ok) {
+      alert("Έγινε αποστολή σύνδεσμου επαναφοράς (προσομοίωση).");
+      showPage("loginPage");
+    } else {
+      document.getElementById("forgotErrorMessage").textContent = data.error || "Σφάλμα";
+    }
+  } catch (err) {
+    console.error(err);
+    document.getElementById("forgotErrorMessage").textContent = "Σφάλμα δικτύου";
+  }
+}
+
+async function resetPassword(e) {
+  e.preventDefault();
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get("token");
+  const newPassword = document.getElementById("newPassword").value.trim();
+
+  if (!token || !newPassword) {
+    document.getElementById("resetErrorMessage").textContent = "Λείπουν δεδομένα";
+    return;
+  }
+
+  try {
+    const res = await fetch("/api/auth/reset-password", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token, newPassword })
+    });
+    const data = await res.json();
+
+    if (res.ok) {
+      alert("Ο κωδικός άλλαξε επιτυχώς!");
+      showPage("loginPage");
+    } else {
+      document.getElementById("resetErrorMessage").textContent = data.error || "Σφάλμα";
+    }
+  } catch (err) {
+    console.error(err);
+    document.getElementById("resetErrorMessage").textContent = "Σφάλμα δικτύου";
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("forgotForm").addEventListener("submit", forgotPassword);
+  document.getElementById("resetForm").addEventListener("submit", resetPassword);
+});
+
 async function logout() {
   try { await fetch("/api/auth/logout", { method: "POST", credentials: "include" }); } catch(err){}
   finally {
@@ -223,4 +284,3 @@ document.addEventListener("DOMContentLoaded", () => {
   if(token && user) showPage("tasksPage");
   else showPage("loginPage");
 });
-
