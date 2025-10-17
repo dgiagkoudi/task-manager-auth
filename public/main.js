@@ -120,7 +120,7 @@ async function forgotPassword(e) {
     const data = await res.json();
 
     if (res.ok) {
-      alert("Έγινε αποστολή σύνδεσμου επαναφοράς (προσομοίωση).");
+      alert("Στάλθηκε σύνδεσμος επαναφοράς στο email σας.");
       showPage("loginPage");
     } else {
       document.getElementById("forgotErrorMessage").textContent = data.error || "Σφάλμα";
@@ -133,13 +133,13 @@ async function forgotPassword(e) {
 
 async function resetPassword(e) {
   e.preventDefault();
+  clearErrors();
   const params = new URLSearchParams(window.location.search);
   const token = params.get("token");
   const newPassword = document.getElementById("newPassword").value.trim();
 
   if (!token || !newPassword) {
-    document.getElementById("resetErrorMessage").textContent = "Λείπουν δεδομένα";
-    return;
+    return document.getElementById("resetErrorMessage").textContent = "Λείπουν δεδομένα";
   }
 
   try {
