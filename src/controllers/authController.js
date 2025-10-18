@@ -8,6 +8,7 @@ require("dotenv").config();
 const ACCESS_TOKEN_EXPIRES_IN = process.env.ACCESS_TOKEN_EXPIRES_IN || "1h";
 const REFRESH_TOKEN_EXPIRES_IN = process.env.REFRESH_TOKEN_EXPIRES_IN || "7d";
 const COOKIE_SECURE = process.env.COOKIE_SECURE === "true";
+const isLocal = process.env.NODE_ENV !== "production";
 
 function signAccessToken(user) {
   return jwt.sign(
@@ -34,10 +35,11 @@ const transporter = nodemailer.createTransport({
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
   },
+  tls: isLocal ? { rejectUnauthorized: false } : undefined
 });
 
-async function sendResetEmail(email, token) {
-  const resetUrl = `${process.env.FRONTEND_URL}?token=${token}`;
+async function sendResetEmail(email, resetToken) {
+  const resetUrl = `${process.env.FRONTEND_URL}/index.html?page=reset&token=${resetToken}`;
   const mailOptions = {
     from: process.env.SMTP_FROM,
     to: email,
@@ -179,52 +181,61 @@ const forgotPassword = async (req, res, next) => {
 
   try {
     const user = await prisma.user.findUnique({ where: { email } });
-    if (!user) return res.status(404).json({ error: "Δεν υπάρχει χρήστης με αυτό το email" });
+    if (!user)
+      return res.status(404).json({ error: "Δεν υπάρχει χρήστης με αυτό το email" });
 
     const resetToken = crypto.randomBytes(32).toString("hex");
-    const expiry = new Date(Date.now() + 1000 * 60 * 15);
+    const expiry = new Date(Date.now() + 1000 * 60 * 15); 
 
-    await prisma.user.update({where: { id: user.id }, data: { resetToken, resetTokenExpiry: expiry }});
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { resetToken, resetTokenExpiry: expiry },
+    });
 
     await sendResetEmail(email, resetToken);
 
     res.json({ message: "Εστάλη email επαναφοράς κωδικού!" });
   } catch (err) {
-    console.error(err);
-    next(err);
+    console.error("Σφάλμα κατά την αποστολή email:", err);
+    res.status(500).json({ error: "Αποτυχία αποστολής email. Δοκιμάστε ξανά αργότερα." });
   }
 };
 
 // reset password
 const resetPassword = async (req, res, next) => {
   const { token, newPassword } = req.body;
-  if (!token || !newPassword)
+
+  if (!token || !newPassword) {
     return res.status(400).json({ error: "Λείπουν δεδομένα" });
+  }
 
   try {
     const user = await prisma.user.findFirst({
       where: {
         resetToken: token,
-        resetTokenExpiry: { gt: new Date() }
-      }
+        resetTokenExpiry: { gt: new Date() },
+      },
     });
 
-    if (!user)
+    if (!user) {
       return res.status(400).json({ error: "Μη έγκυρο ή ληγμένο token" });
+    }
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
+
     await prisma.user.update({
       where: { id: user.id },
       data: {
         password: hashedPassword,
         resetToken: null,
-        resetTokenExpiry: null
-      }
+        resetTokenExpiry: null,
+      },
     });
 
     res.json({ message: "Ο κωδικός άλλαξε επιτυχώς!" });
   } catch (err) {
-    next(err);
+    console.error("Σφάλμα κατά την αλλαγή κωδικού:", err);
+    res.status(500).json({ error: "Σφάλμα διακομιστή. Δοκιμάστε ξανά." });
   }
 };
 

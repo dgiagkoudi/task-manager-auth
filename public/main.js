@@ -39,6 +39,8 @@ function clearErrors() {
   document.getElementById("loginErrorMessage").textContent = "";
   document.getElementById("registerErrorMessage").textContent = "";
   document.getElementById("taskErrorMessage").textContent = "";
+  document.getElementById("forgotErrorMessage").textContent = "";
+  document.getElementById("resetErrorMessage").textContent = "";
 }
 
 // auth
@@ -109,7 +111,13 @@ async function login(e) {
 async function forgotPassword(e) {
   e.preventDefault();
   const email = document.getElementById("forgotEmail").value.trim();
-  if (!email) return;
+  const messageEl = document.getElementById("forgotErrorMessage");
+  messageEl.textContent = "";
+
+  if (!email) {
+    messageEl.textContent = "Παρακαλώ εισάγετε email.";
+    return;
+  }
 
   try {
     const res = await fetch("/api/auth/forgot-password", {
@@ -117,29 +125,39 @@ async function forgotPassword(e) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email })
     });
+
     const data = await res.json();
 
     if (res.ok) {
-      alert("Στάλθηκε σύνδεσμος επαναφοράς στο email σας.");
-      showPage("loginPage");
+      messageEl.style.color = "green";
+      messageEl.textContent = "Εστάλη email επαναφοράς κωδικού! Ελέγξτε τα εισερχόμενά σας.";
     } else {
-      document.getElementById("forgotErrorMessage").textContent = data.error || "Σφάλμα";
+      messageEl.style.color = "red";
+      messageEl.textContent = data.error || "Σφάλμα κατά την αποστολή email.";
     }
   } catch (err) {
     console.error(err);
-    document.getElementById("forgotErrorMessage").textContent = "Σφάλμα δικτύου";
+    messageEl.style.color = "red";
+    messageEl.textContent = "Σφάλμα δικτύου. Προσπαθήστε ξανά.";
   }
 }
 
 async function resetPassword(e) {
   e.preventDefault();
   clearErrors();
-  const params = new URLSearchParams(window.location.search);
-  const token = params.get("token");
+  const token = localStorage.getItem("resetToken");
   const newPassword = document.getElementById("newPassword").value.trim();
+  const confirmPassword = document.getElementById("confirmPassword").value.trim();
+  const messageEl = document.getElementById("resetErrorMessage");
 
-  if (!token || !newPassword) {
-    return document.getElementById("resetErrorMessage").textContent = "Λείπουν δεδομένα";
+  if (!token || !newPassword || !confirmPassword) {
+    messageEl.textContent = "Λείπουν δεδομένα";
+    return;
+  }
+
+  if (newPassword !== confirmPassword) {
+    messageEl.textContent = "Οι κωδικοί δεν ταιριάζουν";
+    return;
   }
 
   try {
@@ -152,20 +170,16 @@ async function resetPassword(e) {
 
     if (res.ok) {
       alert("Ο κωδικός άλλαξε επιτυχώς!");
+      localStorage.removeItem("resetToken");
       showPage("loginPage");
     } else {
-      document.getElementById("resetErrorMessage").textContent = data.error || "Σφάλμα";
+      messageEl.textContent = data.error || "Σφάλμα";
     }
   } catch (err) {
     console.error(err);
-    document.getElementById("resetErrorMessage").textContent = "Σφάλμα δικτύου";
+    messageEl.textContent = "Σφάλμα δικτύου";
   }
 }
-
-document.addEventListener("DOMContentLoaded", () => {
-  document.getElementById("forgotForm").addEventListener("submit", forgotPassword);
-  document.getElementById("resetForm").addEventListener("submit", resetPassword);
-});
 
 async function logout() {
   try { await fetch("/api/auth/logout", { method: "POST", credentials: "include" }); } catch(err){}
@@ -274,13 +288,26 @@ function filterTasks(mode) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  const params = new URLSearchParams(window.location.search);
+  const resetToken = params.get("token");
+
+  if (resetToken) {
+    showPage("resetPasswordPage");
+    localStorage.setItem("resetToken", resetToken);
+  }
+
   document.getElementById("registerForm").addEventListener("submit", register);
   document.getElementById("loginForm").addEventListener("submit", login);
+  document.getElementById("forgotForm").addEventListener("submit", forgotPassword);
+  document.getElementById("resetForm").addEventListener("submit", resetPassword);
   document.getElementById("addTaskBtn").addEventListener("click", addTask);
   document.getElementById("logout-btn").addEventListener("click", logout);
 
   const token = localStorage.getItem("token");
   const user = localStorage.getItem("user");
-  if(token && user) showPage("tasksPage");
-  else showPage("loginPage");
+
+  if (!resetToken) {
+    if(token && user) showPage("tasksPage");
+    else showPage("loginPage");
+  }
 });
